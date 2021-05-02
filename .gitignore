@@ -130,3 +130,6 @@ dmypy.json
 
 # Ignore Intellij project file
 .idea/
+
+# Ignore output artifacts
+out/
