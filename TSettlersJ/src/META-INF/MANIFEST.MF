@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: echo_server.EchoClient
-Class-Path: JSettlers-2.4.00.jar JSettlersServer-2.4.00.jar
-

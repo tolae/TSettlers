@@ -7,7 +7,7 @@ import soc.robot.SOCRobotClient;
 import soc.util.CappedQueue;
 import soc.util.SOCRobotParameters;
 
-public class EchoBrain extends SOCRobotBrain{
+public class EchoBrain extends SOCRobotBrain {
     /**
      * Create a robot brain to play a game.
      * <p>
@@ -29,8 +29,20 @@ public class EchoBrain extends SOCRobotBrain{
     @Override
     protected void planBuilding()
     {
-        super.planBuilding();
-
         System.out.println("Planning on building something!");
+        super.planBuilding();
+    }
+
+    @Override
+    protected void handleGAMESTATE(int gs) {
+        if (gs == SOCGame.OVER)
+        {
+            System.out.print("Total Gained Resources: ");
+            System.out.println(ourPlayerData.getResources().getGainedTotal());
+
+            System.out.print("Total Lost Resources: ");
+            System.out.println(ourPlayerData.getResources().getLostTotal());
+        }
+        super.handleGAMESTATE(gs);
     }
 }

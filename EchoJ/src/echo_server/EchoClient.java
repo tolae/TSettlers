@@ -1,12 +1,40 @@
 package echo_server;
 
 import soc.baseclient.ServerConnectInfo;
+import soc.game.SOCGame;
+import soc.message.SOCMessage;
+import soc.robot.SOCRobotBrain;
 import soc.robot.SOCRobotClient;
+import soc.util.CappedQueue;
+import soc.util.SOCRobotParameters;
 import soc.util.Version;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+
 public class EchoClient extends SOCRobotClient {
+
+    private EchoPyClient pyClient;
+
     public EchoClient(ServerConnectInfo sci, String nn, String pw) throws IllegalArgumentException {
         super(sci, nn, pw);
+    }
+
+    @Override
+    public SOCRobotBrain createBrain
+            (final SOCRobotParameters params, final SOCGame ga, final CappedQueue<SOCMessage> mq)
+    {
+        return new EchoBrain(this, params, ga, mq);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+
+        this.pyClient = new EchoPyClient();
+        this.pyClient.init();
     }
 
     public static void main(String[] args) {
@@ -18,7 +46,7 @@ public class EchoClient extends SOCRobotClient {
             return;
         }
 
-        SOCRobotClient ex1 = new SOCRobotClient
+        EchoClient ex1 = new EchoClient
                 (new ServerConnectInfo(args[0], Integer.parseInt(args[1]), args[4]), args[2], args[3]);
         ex1.init();
     }

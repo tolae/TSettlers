@@ -1,0 +1,3 @@
+[submodule "libs/JSettlers2"]
+	path = libs/JSettlers2
+	url = https://github.com/jdmonin/JSettlers2.git
