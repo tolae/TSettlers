@@ -1,5 +1,9 @@
 package echo_server;
 
+import echo_server.messages.EchoDataFactory;
+import echo_server.messages.EchoKeepAlive;
+import echo_server.messages.IEchoData;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,6 +35,20 @@ public class EchoPyClient implements Runnable {
             this.pyConnected = true;
             this.pyThread = new Thread(this);
             this.pyThread.start();
+
+            // Keep Alive Thread
+            new Thread(() -> {
+                try {
+                    EchoMessage m = new EchoMessage();
+                    m.length = 1;
+                    m.type = EchoDataFactory.KEEP_ALIVE_TYPE;
+                    m.data = EchoDataFactory.build(EchoDataFactory.KEEP_ALIVE_TYPE);
+                    while (pyConnected) {
+                        transmit(m);
+                        Thread.sleep(10000);
+                    }
+                } catch (InterruptedException e) { }
+            }).start();
         } catch (IOException e) {
             System.err.println("Unable to connect to Python Brain Socket: " + e);
         } catch (Exception e) {
@@ -45,16 +63,38 @@ public class EchoPyClient implements Runnable {
         byte[] s = new byte[255];
         try {
             while (this.pyConnected) {
-                System.out.println("Waiting for data...");
-                this.pyIn.read(s, 0, 5);
-                System.out.println(new String(s, StandardCharsets.UTF_8));
-                this.pyOut.write(s, 0, 5);
+                if (this.pyIn.read(s, 0, 5) != -1) {
+                    System.out.print("Received: ");
+                    System.out.println(new String(s, StandardCharsets.UTF_8));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             this.destroy();
         }
+    }
+
+    public void transmit(EchoMessage mes) {
+        final int offset = 3;
+
+        try {
+            byte[] packet = new byte[mes.length + offset];
+            packet[0] = (byte) (mes.length >> 8);
+            packet[1] = (byte) (mes.length >> 0);
+            packet[2] = (byte) mes.type;
+            for (int i = 0; i < mes.length; i++) {
+                packet[i + offset] = mes.data.getByte(i);
+            }
+            this.pyOut.write(packet);
+        } catch (IOException e) {
+            System.err.print("Unable to transmit message: " + mes.toString());
+            System.err.println(e);
+        }
+    }
+
+    public boolean isConnected() {
+        return this.pyConnected;
     }
 
     private void destroy() {
@@ -66,10 +106,6 @@ public class EchoPyClient implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean isConnected() {
-        return this.pyConnected;
     }
 
     public static void main(String[] args) {

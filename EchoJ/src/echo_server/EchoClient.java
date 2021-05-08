@@ -16,7 +16,7 @@ import java.net.Socket;
 
 public class EchoClient extends SOCRobotClient {
 
-    private EchoPyClient pyClient;
+    public EchoPyClient pyClient;
 
     public EchoClient(ServerConnectInfo sci, String nn, String pw) throws IllegalArgumentException {
         super(sci, nn, pw);
@@ -31,10 +31,15 @@ public class EchoClient extends SOCRobotClient {
 
     @Override
     public void init() {
-        super.init();
-
         this.pyClient = new EchoPyClient();
         this.pyClient.init();
+        super.init();
+    }
+
+    @Override
+    public void run() {
+        while (!this.pyClient.isConnected());
+        super.run();
     }
 
     public static void main(String[] args) {

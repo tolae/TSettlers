@@ -1,6 +1,7 @@
 package echo_server;
 
 import soc.game.SOCGame;
+import soc.game.SOCResourceSet;
 import soc.message.SOCMessage;
 import soc.robot.SOCRobotBrain;
 import soc.robot.SOCRobotClient;
@@ -30,6 +31,7 @@ public class EchoBrain extends SOCRobotBrain {
     protected void planBuilding()
     {
         System.out.println("Planning on building something!");
+        SOCResourceSet s = ourPlayerData.getResources();
         super.planBuilding();
     }
 

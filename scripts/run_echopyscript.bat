@@ -1,3 +1,3 @@
-start cmd /C python main.py
+start cmd /C python out\artifacts\Echo\server.py localhost 8881 -m echo
 timeout 2
-java -cp EchoPyClient.jar echo_server.EchoPyClient
+java -jar out\artifacts\Echo\EchoPyClient.jar
