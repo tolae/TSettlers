@@ -8,12 +8,12 @@ import java.util.Vector;
 public class EchoResourceProduction implements IEchoData {
     public static final int RESOURCE_PRODUCTION_LENGTH = SOCBoard.DESERT_HEX - SOCBoard.CLAY_HEX;
 
-    private int[] resourceProduction;
+    private float[] resourceProduction;
 
     @Override
     public void setData(Object data) {
         SOCPlayer playerData = (SOCPlayer) data;
-        resourceProduction = new int[RESOURCE_PRODUCTION_LENGTH];
+        resourceProduction = new float[RESOURCE_PRODUCTION_LENGTH];
 
         SOCBoard board = playerData.getGame().getBoard();
         Vector<SOCSettlement> settlements = playerData.getSettlements();
@@ -33,10 +33,12 @@ public class EchoResourceProduction implements IEchoData {
     private void setResourceProduction(List<Integer> adjHexes, SOCBoard board, int amt) {
         for (int hex : adjHexes) {
             int hexType = board.getHexTypeFromCoord(hex);
+            int hexNum = board.getHexNumFromCoord(hex);
             if (hexType < SOCBoard.CLAY_HEX || hexType > SOCBoard.WOOD_HEX)
                 continue;
 
-            resourceProduction[hexType - SOCBoard.CLAY_HEX] += amt;
+            resourceProduction[(hexType - SOCBoard.CLAY_HEX) * 2] += amt;
+            resourceProduction[(hexType - SOCBoard.CLAY_HEX) * 2 + 1] += hexNum;
         }
     }
 
