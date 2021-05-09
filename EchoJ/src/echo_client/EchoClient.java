@@ -1,4 +1,4 @@
-package echo_server;
+package echo_client;
 
 import soc.baseclient.ServerConnectInfo;
 import soc.game.SOCGame;
@@ -8,11 +8,6 @@ import soc.robot.SOCRobotClient;
 import soc.util.CappedQueue;
 import soc.util.SOCRobotParameters;
 import soc.util.Version;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
 
 public class EchoClient extends SOCRobotClient {
 

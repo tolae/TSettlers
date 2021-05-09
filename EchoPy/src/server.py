@@ -2,6 +2,8 @@ import argparse
 import socket
 from time import sleep
 
+from messages import MessageFactory
+
 
 def print_help():
     print("Help")
@@ -51,11 +53,12 @@ def qlearned_server():
             sleep(3)
             while True:
                 length = int.from_bytes(conn.recv(2), byteorder='big', signed=False)
-                packet = {'length': length,
-                          'type': int.from_bytes(conn.recv(1), byteorder='big', signed=False),
-                          'data': conn.recv(length)
-                          }
-                print("Received: {} - {}".format(packet['length'], packet['type']))
+                message = MessageFactory.build({'length': length,
+                                         'type': int.from_bytes(conn.recv(1), byteorder='big', signed=False),
+                                         'data': conn.recv(length)
+                                         })
+                print("Received: " + message.__str__())
+
 
 if __name__ == '__main__':
     args = parse_cli()

@@ -1,6 +1,6 @@
-package echo_server;
+package echo_client;
 
-import echo_server.messages.IEchoData;
+import echo_client.messages.IEchoData;
 
 public class EchoMessage {
     public int length;
