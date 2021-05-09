@@ -41,7 +41,7 @@ public class EchoPyClient implements Runnable {
                     m.length = 1;
                     m.type = EchoDataFactory.KEEP_ALIVE_TYPE;
                     m.data = EchoDataFactory.build(EchoDataFactory.KEEP_ALIVE_TYPE);
-                    while (pyConnected) {
+                    while (true) {
                         transmit(m);
                         Thread.sleep(10000);
                     }
@@ -67,9 +67,8 @@ public class EchoPyClient implements Runnable {
                 }
             }
         } catch (IOException e) {
+            System.err.println("Failed to read data.");
             e.printStackTrace();
-        } finally {
-            this.destroy();
         }
     }
 
@@ -87,7 +86,11 @@ public class EchoPyClient implements Runnable {
             this.pyOut.write(packet);
         } catch (IOException e) {
             System.err.print("Unable to transmit message: " + mes.toString());
-            System.err.println(e);
+            e.printStackTrace();
+            if (mes.type == EchoDataFactory.KEEP_ALIVE_TYPE) {
+                this.pyConnected = false;
+                this.destroy();
+            }
         }
     }
 
