@@ -4,6 +4,7 @@ from .Items import ItemsMessage
 from .KeepAlive import KeepAliveMessage
 from .EndOfGame import EndOfGameMessage
 from .Plan import PlanMessage
+from .Possiblities import PossibilitiesMessage
 from .Resource import ResourceMessage, ResourceProductionMessage
 from .Unknown import UnknownMessage
 
@@ -14,6 +15,7 @@ RESOURCE_PROD = 3
 ITEMS = 4
 END_OF_GAME = 5
 PLAN = 6
+POSSIBILITIES = 7
 
 
 def build(package):
@@ -30,6 +32,8 @@ def build(package):
         return EndOfGameMessage(package)
     elif t == PLAN:
         return PlanMessage(package)
+    elif t == POSSIBILITIES:
+        return PossibilitiesMessage(package)
     else:
         return UnknownMessage(package)
 

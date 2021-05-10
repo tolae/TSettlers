@@ -1,6 +1,7 @@
 import socket
 from time import sleep
 
+import numpy as np
 from messages import MessageFactory
 
 
@@ -10,6 +11,13 @@ class QServer:
         self.conn = None
         self.host = host
         self.port = port
+
+        self.env = {
+            'roads': 0,
+            'settlements': 0,
+            'cities': 0,
+            'dev_cards': 0
+        }
 
     def run(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -47,11 +55,25 @@ class QServer:
             pass # TODO: Archive resource production
         elif msg.type() == MessageFactory.ITEMS:
             pass # TODO: Archive items of our player and opponents
+        elif msg.type() == MessageFactory.POSSIBILITIES:
+            self.env['roads'] = msg.data().roads
+            self.env['settlements'] = msg.data().settlements
+            self.env['cities'] = msg.data().cities
+            self.env['dev_cards'] = msg.data().dev_cards
         elif msg.type() == MessageFactory.PLAN:
+            possible_actions = [4]
+            if self.env['roads'] > 0:
+                possible_actions.append(0)
+            if self.env['settlements'] > 0:
+                possible_actions.append(1)
+            if self.env['cities'] > 0:
+                possible_actions.append(2)
+            if self.env['dev_cards'] > 0:
+                possible_actions.append(3)
             package = {
                 'type': msg.type(),
                 'length': msg.length(),
-                'data': 4,
+                'data': np.random.choice(possible_actions),
             }
-            msgToSend = MessageFactory.build(package)
-            self.conn.sendall(MessageFactory.to_bytearray(msgToSend))
+            msg_to_send = MessageFactory.build(package)
+            self.conn.sendall(MessageFactory.to_bytearray(msg_to_send))

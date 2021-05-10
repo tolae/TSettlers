@@ -5,9 +5,15 @@ import echo_client.messages.EchoItems;
 import soc.game.SOCGame;
 import soc.game.SOCPlayer;
 import soc.message.SOCMessage;
+import soc.robot.SOCPossiblePiece;
+import soc.robot.SOCPossibleSettlement;
 import soc.robot.SOCRobotBrain;
 import soc.util.CappedQueue;
 import soc.util.SOCRobotParameters;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class EchoBrain extends SOCRobotBrain {
     private int action;
@@ -50,6 +56,21 @@ public class EchoBrain extends SOCRobotBrain {
 
     private void transmitState() {
         EchoPyClient pyClient = ((EchoClient) this.client).pyClient;
+
+        EchoMessage possibilities = EchoFactory.build(EchoFactory.POSSIBILITIES_TYPE);
+        List<SOCPossiblePiece> settlementsNow = new ArrayList<>();
+        for (SOCPossibleSettlement posSet : ourPlayerTracker.getPossibleSettlements().values()) {
+            if (posSet.getNecessaryRoads().isEmpty()) {
+                settlementsNow.add(posSet);
+            }
+        }
+        possibilities.data.setData(new int[] {
+                ourPlayerTracker.getPossibleRoads().size(),
+                settlementsNow.size(),
+                ourPlayerTracker.getPossibleCities().size(),
+                game.getNumDevCards()
+        });
+        pyClient.transmit(possibilities);
 
         EchoMessage resourcesInHand = EchoFactory.build(EchoFactory.RESOURCE_SET_TYPE);
         resourcesInHand.data.setData(ourPlayerData.getResources());
