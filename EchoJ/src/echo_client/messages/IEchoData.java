@@ -1,9 +1,9 @@
 package echo_client.messages;
 
 public interface IEchoData {
-    void setData(Object data);
+    void setData(final Object data);
 
-    byte getByte(int index);
+    byte getByte(final int index);
 
     int getLength();
 }

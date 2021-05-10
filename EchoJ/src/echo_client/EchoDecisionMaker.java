@@ -4,6 +4,8 @@ import soc.robot.SOCPossiblePiece;
 import soc.robot.SOCRobotBrain;
 import soc.robot.SOCRobotDM;
 
+import java.util.EmptyStackException;
+
 public class EchoDecisionMaker extends SOCRobotDM {
     EchoBrain echoBrain;
 
@@ -24,7 +26,11 @@ public class EchoDecisionMaker extends SOCRobotDM {
         super.smartGameStrategy(buildingETAs);
 
         // Remove the chosen piece from smart game strategy
-        buildingPlan.pop();
+        try {
+            buildingPlan.pop();
+        } catch (EmptyStackException e) {
+            System.err.println("Failed smart game strategy.");
+        }
 
         // Get the action prescribed by the brain
         SOCPossiblePiece piece = mapActionToPiece(echoBrain.getAction());

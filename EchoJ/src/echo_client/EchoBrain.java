@@ -12,7 +12,6 @@ import soc.util.CappedQueue;
 import soc.util.SOCRobotParameters;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class EchoBrain extends SOCRobotBrain {
