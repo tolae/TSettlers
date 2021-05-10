@@ -2,11 +2,6 @@ from abc import abstractmethod, ABC
 
 
 class Message(ABC):
-    KEEP_ALIVE = 1
-    RESOURCE_SET = 2
-    RESOURCE_PROD = 3
-    ITEMS = 4
-
     def __init__(self, package):
         self._type = package['type']
         self._length = package['length']

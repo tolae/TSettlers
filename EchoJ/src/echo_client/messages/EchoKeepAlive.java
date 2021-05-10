@@ -13,4 +13,9 @@ public class EchoKeepAlive implements IEchoData {
     public int getLength() {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "KeepAlive";
+    }
 }

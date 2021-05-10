@@ -5,6 +5,7 @@ import echo_client.messages.EchoItems;
 import echo_client.messages.EchoResourceSet;
 import echo_client.messages.EchoResourceProduction;
 import soc.game.SOCGame;
+import soc.game.SOCPlayer;
 import soc.message.SOCMessage;
 import soc.robot.SOCRobotBrain;
 import soc.util.CappedQueue;
@@ -47,18 +48,30 @@ public class EchoBrain extends SOCRobotBrain {
         ((EchoItems) items.data).setIsMainPlayer();
         pyClient.transmit(items);
 
+        for (SOCPlayer player : game.getPlayers()) {
+            if (player.getPlayerNumber() == ourPlayerData.getPlayerNumber())
+                continue;
+
+            EchoMessage opponentItems = EchoFactory.build(EchoFactory.ITEMS_TYPE);
+            opponentItems.data.setData(player);
+            pyClient.transmit(opponentItems);
+        }
+
         super.planBuilding();
     }
 
     @Override
     protected void handleGAMESTATE(int gs) {
-        if (gs == SOCGame.OVER)
-        {
+        if (gs == SOCGame.OVER) {
             System.out.print("Total Gained Resources: ");
             System.out.println(ourPlayerData.getResources().getGainedTotal());
 
             System.out.print("Total Lost Resources: ");
             System.out.println(ourPlayerData.getResources().getLostTotal());
+
+            EchoMessage eog = EchoFactory.build(EchoFactory.END_OF_GAME_TYPE);
+            eog.data.setData(ourPlayerData);
+            ((EchoClient) this.client).pyClient.transmit(eog);
         }
         super.handleGAMESTATE(gs);
     }

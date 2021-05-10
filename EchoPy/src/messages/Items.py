@@ -13,7 +13,7 @@ class ItemsMessage(Message):
         return ItemsData(bytearray(data))
 
     def __str__(self):
-        return "ITEMS FOR P|{} - L{} K{}".format(
-            "TBot" if self.data().player == 255 else "Opponent",
+        return "ITEMS FOR P|{}[{}] - L{} K{}".format(
+            "TBot" if self.data().player == 255 else "Opponent", self.data().player,
             self.data().longest_road_length, self.data().knights_used
         )

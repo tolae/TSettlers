@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
 public class EchoPyClient implements Runnable {
@@ -38,7 +39,7 @@ public class EchoPyClient implements Runnable {
             new Thread(() -> {
                 try {
                     EchoMessage m = EchoFactory.build(EchoFactory.KEEP_ALIVE_TYPE);
-                    while (true) {
+                    while (pyConnected) {
                         transmit(m);
                         Thread.sleep(10000);
                     }
@@ -63,6 +64,9 @@ public class EchoPyClient implements Runnable {
                     System.out.println(new String(s, StandardCharsets.UTF_8));
                 }
             }
+        } catch (SocketException e) {
+            System.err.println("Python server has terminated unexpectedly!");
+            this.destroy();
         } catch (IOException e) {
             System.err.println("Failed to read data.");
             e.printStackTrace();
@@ -82,7 +86,7 @@ public class EchoPyClient implements Runnable {
             }
             this.pyOut.write(packet);
         } catch (IOException e) {
-            System.err.print("Unable to transmit message: " + mes.toString());
+            System.err.println("Unable to transmit message: " + mes);
             e.printStackTrace();
             if (mes.type == EchoFactory.KEEP_ALIVE_TYPE) {
                 this.pyConnected = false;
