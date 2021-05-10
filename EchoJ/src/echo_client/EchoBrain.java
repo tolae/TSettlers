@@ -2,8 +2,6 @@ package echo_client;
 
 import echo_client.messages.EchoFactory;
 import echo_client.messages.EchoItems;
-import echo_client.messages.EchoResourceSet;
-import echo_client.messages.EchoResourceProduction;
 import soc.game.SOCGame;
 import soc.game.SOCPlayer;
 import soc.message.SOCMessage;
@@ -12,27 +10,45 @@ import soc.util.CappedQueue;
 import soc.util.SOCRobotParameters;
 
 public class EchoBrain extends SOCRobotBrain {
-    /**
-     * Create a robot brain to play a game.
-     * <p>
-     * Depending on {@link SOCGame#getGameOptions() game options},
-     * constructor might copy and alter the robot parameters
-     * (for example, to clear {@link SOCRobotParameters#getTradeFlag()}).
-     * <p>
-     * Please call {@link #setOurPlayerData()} before using this brain or starting its thread.
-     *
-     * @param rc     the robot client
-     * @param params the robot parameters
-     * @param ga     the game we're playing
-     * @param mq     the message queue
-     */
+    private int action;
+
     public EchoBrain(EchoClient rc, SOCRobotParameters params, SOCGame ga, CappedQueue<SOCMessage> mq) {
         super(rc, params, ga, mq);
+
+        robotParameters = new SOCRobotParameters(
+                params.getMaxGameLength(),
+                params.getMaxETA(),
+                params.getETABonusFactor(),
+                params.getAdversarialFactor(),
+                params.getLeaderAdversarialFactor(),
+                params.getDevCardMultiplier(),
+                params.getThreatMultiplier(),
+                0,
+                params.getTradeFlag()
+        );
+    }
+
+    public int getAction() {
+        return action;
+    }
+
+    @Override
+    protected void setStrategyFields() {
+        super.setStrategyFields();
+
+        decisionMaker = new EchoDecisionMaker(this);
     }
 
     @Override
     protected void planBuilding() {
-        System.out.println("Planning on building something!");
+        transmitState();
+
+        receiveAction();
+
+        super.planBuilding();
+    }
+
+    private void transmitState() {
         EchoPyClient pyClient = ((EchoClient) this.client).pyClient;
 
         EchoMessage resourcesInHand = EchoFactory.build(EchoFactory.RESOURCE_SET_TYPE);
@@ -56,14 +72,17 @@ public class EchoBrain extends SOCRobotBrain {
             opponentItems.data.setData(player);
             pyClient.transmit(opponentItems);
         }
+    }
 
+    private void receiveAction() {
+        EchoPyClient pyClient = ((EchoClient) this.client).pyClient;
         EchoMessage plan = EchoFactory.build(EchoFactory.PLAN_TYPE);
         pyClient.transmit(plan);
 
         plan = pyClient.receive();
         System.out.println(plan.data.toString());
 
-        super.planBuilding();
+        action = plan.data.getByte(0);
     }
 
     @Override
