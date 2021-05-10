@@ -2,7 +2,7 @@ import argparse
 import socket
 from time import sleep
 
-from messages import MessageFactory
+from servers.qlearning import QServer
 
 
 def print_help():
@@ -42,27 +42,10 @@ def echo_server():
                 sleep(1)
 
 
-def qlearned_server():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((args.host, args.port))
-        print("Bound and listening...")
-        s.listen()
-        conn, addr = s.accept()
-        with conn:
-            print('Connected by', addr)
-            sleep(3)
-            while True:
-                length = int.from_bytes(conn.recv(2), byteorder='big', signed=False)
-                message = MessageFactory.build({'length': length,
-                                         'type': int.from_bytes(conn.recv(1), byteorder='big', signed=False),
-                                         'data': conn.recv(length)
-                                         })
-                print("Received: " + message.__str__())
-
-
 if __name__ == '__main__':
     args = parse_cli()
     if 'echo' in args.mode:
         echo_server()
     else:
-        qlearned_server()
+        qserver = QServer(args.host, args.port)
+        qserver.run()

@@ -1,13 +1,14 @@
 package echo_client;
 
 import echo_client.messages.EchoFactory;
+import echo_client.messages.EchoMessageFIFO;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class EchoPyClient implements Runnable {
     public static final String PYTHON_BRAIN_IP = "127.0.0.1";
@@ -17,6 +18,8 @@ public class EchoPyClient implements Runnable {
     private DataInputStream pyIn;
     private DataOutputStream pyOut;
     private Thread pyThread;
+
+    private EchoMessageFIFO pyMsgs;
 
     private boolean pyConnected;
 
@@ -30,6 +33,8 @@ public class EchoPyClient implements Runnable {
             this.pySocket.setSoTimeout(300000);
             this.pyIn = new DataInputStream(this.pySocket.getInputStream());
             this.pyOut = new DataOutputStream(this.pySocket.getOutputStream());
+
+            this.pyMsgs = new EchoMessageFIFO(10);
 
             this.pyConnected = true;
             this.pyThread = new Thread(this);
@@ -57,11 +62,27 @@ public class EchoPyClient implements Runnable {
         Thread.currentThread().setName("Echo-Python-Client");
 
         byte[] s = new byte[255];
+        int msgType = 0;
+        int msgLength = 0;
+        byte[] msgData;
         try {
             while (this.pyConnected) {
-                if (this.pyIn.read(s, 0, 5) != -1) {
-                    System.out.print("Received: ");
-                    System.out.println(new String(s, StandardCharsets.UTF_8));
+                if (this.pyIn.read(s, 0, 2) == 2) {
+                    System.out.println("Received a msg! Parsing...");
+                    msgLength = (s[0] << 8) + s[1];
+                    msgData = new byte[msgLength];
+                    this.pyIn.read(s, 2, 1);
+                    msgType = s[2];
+                    if (this.pyIn.read(s, 3, msgLength) != msgLength) {
+                        System.err.println("Failed to read entire msg!");
+                        continue;
+                    }
+                    System.arraycopy(s, 3, msgData, 0, msgLength);
+                    EchoMessage msg = EchoFactory.build(msgType);
+                    msg.data.setData(msgData);
+                    if (!this.pyMsgs.offer(msg)) {
+                        System.err.println("Failed to insert msg into queue!");
+                    }
                 }
             }
         } catch (SocketException e) {
@@ -93,6 +114,17 @@ public class EchoPyClient implements Runnable {
                 this.destroy();
             }
         }
+    }
+
+    public EchoMessage receive() {
+        while (this.pyMsgs.peek() == null) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return this.pyMsgs.remove();
     }
 
     public boolean isConnected() {

@@ -57,6 +57,12 @@ public class EchoBrain extends SOCRobotBrain {
             pyClient.transmit(opponentItems);
         }
 
+        EchoMessage plan = EchoFactory.build(EchoFactory.PLAN_TYPE);
+        pyClient.transmit(plan);
+
+        plan = pyClient.receive();
+        System.out.println(plan.data.toString());
+
         super.planBuilding();
     }
 

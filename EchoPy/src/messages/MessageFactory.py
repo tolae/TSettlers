@@ -1,14 +1,19 @@
+import struct
+
 from .Items import ItemsMessage
 from .KeepAlive import KeepAliveMessage
 from .EndOfGame import EndOfGameMessage
+from .Plan import PlanMessage
 from .Resource import ResourceMessage, ResourceProductionMessage
 from .Unknown import UnknownMessage
 
+UNKNOWN = 0
 KEEP_ALIVE = 1
 RESOURCE_SET = 2
 RESOURCE_PROD = 3
 ITEMS = 4
 END_OF_GAME = 5
+PLAN = 6
 
 
 def build(package):
@@ -23,5 +28,14 @@ def build(package):
         return ItemsMessage(package)
     elif t == END_OF_GAME:
         return EndOfGameMessage(package)
+    elif t == PLAN:
+        return PlanMessage(package)
     else:
         return UnknownMessage(package)
+
+
+def to_bytearray(msg):
+    header = struct.pack('>HB', msg.length(), msg.type())
+    if msg.type() == PLAN:
+        return bytearray(header + struct.pack('B', msg.data()))
+    return None
