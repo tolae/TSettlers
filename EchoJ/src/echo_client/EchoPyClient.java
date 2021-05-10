@@ -1,6 +1,6 @@
 package echo_client;
 
-import echo_client.messages.EchoDataFactory;
+import echo_client.messages.EchoFactory;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -37,10 +37,7 @@ public class EchoPyClient implements Runnable {
             // Keep Alive Thread
             new Thread(() -> {
                 try {
-                    EchoMessage m = new EchoMessage();
-                    m.length = 1;
-                    m.type = EchoDataFactory.KEEP_ALIVE_TYPE;
-                    m.data = EchoDataFactory.build(EchoDataFactory.KEEP_ALIVE_TYPE);
+                    EchoMessage m = EchoFactory.build(EchoFactory.KEEP_ALIVE_TYPE);
                     while (true) {
                         transmit(m);
                         Thread.sleep(10000);
@@ -76,18 +73,18 @@ public class EchoPyClient implements Runnable {
         final int offset = 3;
 
         try {
-            byte[] packet = new byte[mes.length + offset];
-            packet[0] = (byte) (mes.length >> 8);
-            packet[1] = (byte) (mes.length >> 0);
+            byte[] packet = new byte[mes.getLength() + offset];
+            packet[0] = (byte) (mes.getLength() >> 8);
+            packet[1] = (byte) (mes.getLength() >> 0);
             packet[2] = (byte) mes.type;
-            for (int i = 0; i < mes.length; i++) {
+            for (int i = 0; i < mes.getLength(); i++) {
                 packet[i + offset] = mes.data.getByte(i);
             }
             this.pyOut.write(packet);
         } catch (IOException e) {
             System.err.print("Unable to transmit message: " + mes.toString());
             e.printStackTrace();
-            if (mes.type == EchoDataFactory.KEEP_ALIVE_TYPE) {
+            if (mes.type == EchoFactory.KEEP_ALIVE_TYPE) {
                 this.pyConnected = false;
                 this.destroy();
             }

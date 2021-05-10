@@ -1,4 +1,4 @@
-from .Item import ItemMessage
+from .Items import ItemsMessage
 from .KeepAlive import KeepAliveMessage
 from .Message import Message
 from .Resource import ResourceMessage, ResourceProductionMessage
@@ -14,6 +14,6 @@ def build(package):
     elif t == Message.RESOURCE_PROD:
         return ResourceProductionMessage(package)
     elif t == Message.ITEMS:
-        return ItemMessage(package)
+        return ItemsMessage(package)
     else:
         return UnknownMessage(package)

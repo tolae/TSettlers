@@ -8,4 +8,9 @@ public class EchoKeepAlive implements IEchoData {
     public byte getByte(int index) {
         return 0;
     }
+
+    @Override
+    public int getLength() {
+        return 0;
+    }
 }

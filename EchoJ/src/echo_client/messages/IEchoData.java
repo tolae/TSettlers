@@ -4,4 +4,6 @@ public interface IEchoData {
     void setData(Object data);
 
     byte getByte(int index);
+
+    int getLength();
 }

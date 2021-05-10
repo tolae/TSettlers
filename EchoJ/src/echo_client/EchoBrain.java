@@ -1,6 +1,6 @@
 package echo_client;
 
-import echo_client.messages.EchoDataFactory;
+import echo_client.messages.EchoFactory;
 import echo_client.messages.EchoItems;
 import echo_client.messages.EchoResourceSet;
 import echo_client.messages.EchoResourceProduction;
@@ -34,25 +34,17 @@ public class EchoBrain extends SOCRobotBrain {
         System.out.println("Planning on building something!");
         EchoPyClient pyClient = ((EchoClient) this.client).pyClient;
 
-        EchoMessage resourcesInHand = new EchoMessage();
-        resourcesInHand.length = EchoResourceSet.RESOURCE_SET_LENGTH;
-        resourcesInHand.type = EchoDataFactory.RESOURCE_SET_TYPE;
-        resourcesInHand.data = EchoDataFactory.build(EchoDataFactory.RESOURCE_SET_TYPE);
+        EchoMessage resourcesInHand = EchoFactory.build(EchoFactory.RESOURCE_SET_TYPE);
         resourcesInHand.data.setData(ourPlayerData.getResources());
         pyClient.transmit(resourcesInHand);
 
-        EchoMessage resourceProduction = new EchoMessage();
-        resourceProduction.length = EchoResourceProduction.RESOURCE_PRODUCTION_LENGTH;
-        resourceProduction.type = EchoDataFactory.RESOURCE_PROD_TYPE;
-        resourceProduction.data = EchoDataFactory.build(EchoDataFactory.RESOURCE_PROD_TYPE);
+        EchoMessage resourceProduction = EchoFactory.build(EchoFactory.RESOURCE_PROD_TYPE);
         resourceProduction.data.setData(ourPlayerData);
         pyClient.transmit(resourceProduction);
 
-        EchoMessage items = new EchoMessage();
-        items.length = EchoItems.ITEM_LENGTH;
-        items.type = EchoDataFactory.ITEMS_TYPE;
-        items.data = EchoDataFactory.build(EchoDataFactory.ITEMS_TYPE);
+        EchoMessage items = EchoFactory.build(EchoFactory.ITEMS_TYPE);
         items.data.setData(ourPlayerData);
+        ((EchoItems) items.data).setIsMainPlayer();
         pyClient.transmit(items);
 
         super.planBuilding();

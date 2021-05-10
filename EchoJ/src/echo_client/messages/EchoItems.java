@@ -1,26 +1,31 @@
 package echo_client.messages;
 
-import soc.game.SOCDevCardConstants;
 import soc.game.SOCPlayer;
 
 public class EchoItems implements IEchoData {
-    public static final int ITEM_LENGTH = 4;
+    private static final int ITEM_LENGTH = 3;
 
-    public byte[] dataSet;
+    private byte[] dataSet;
 
     @Override
     public void setData(Object data) {
         dataSet = new byte[ITEM_LENGTH];
         SOCPlayer playerData = (SOCPlayer) data;
 
-        dataSet[0] = (byte) playerData.getLongestRoadLength();
-        dataSet[1] = (byte) playerData.getSettlements().size();
-        dataSet[2] = (byte) playerData.getCities().size();
-        dataSet[3] = (byte) playerData.getNumKnights();
+        dataSet[0] = (byte) playerData.getPlayerNumber();
+        dataSet[1] = (byte) playerData.getLongestRoadLength();
+        dataSet[2] = (byte) playerData.getNumKnights();
     }
 
     @Override
     public byte getByte(int index) {
         return dataSet[index];
     }
+
+    @Override
+    public int getLength() {
+        return ITEM_LENGTH;
+    }
+
+    public void setIsMainPlayer() { dataSet[0] = -1; }
 }

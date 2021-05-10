@@ -4,9 +4,9 @@ import soc.game.ResourceSet;
 import soc.game.SOCResourceConstants;
 
 public class EchoResourceSet implements IEchoData {
-    public static int RESOURCE_SET_LENGTH = SOCResourceConstants.UNKNOWN - SOCResourceConstants.MIN;
+    private static int RESOURCE_SET_LENGTH = SOCResourceConstants.UNKNOWN - SOCResourceConstants.MIN;
 
-    public byte[] resources;
+    private byte[] resources;
 
     @Override
     public void setData(Object data) {
@@ -23,5 +23,10 @@ public class EchoResourceSet implements IEchoData {
     @Override
     public byte getByte(int index) {
         return resources[index];
+    }
+
+    @Override
+    public int getLength() {
+        return RESOURCE_SET_LENGTH;
     }
 }

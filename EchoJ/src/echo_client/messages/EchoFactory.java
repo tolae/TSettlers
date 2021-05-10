@@ -1,30 +1,34 @@
 package echo_client.messages;
 
-public class EchoDataFactory {
+import echo_client.EchoMessage;
+
+public class EchoFactory {
     public static final int KEEP_ALIVE_TYPE = 1;
     public static final int RESOURCE_SET_TYPE = 2;
     public static final int RESOURCE_PROD_TYPE = 3;
     public static final int ITEMS_TYPE = 4;
 
-    public static IEchoData build(int type) {
-        IEchoData d = null;
+    public static EchoMessage build(int type) {
+        EchoMessage m = new EchoMessage();
         switch (type) {
             case KEEP_ALIVE_TYPE:
-                d = new EchoKeepAlive();
+                m.data = new EchoKeepAlive();
                 break;
             case RESOURCE_SET_TYPE:
-                d = new EchoResourceSet();
+                m.data = new EchoResourceSet();
                 break;
             case RESOURCE_PROD_TYPE:
-                d = new EchoResourceProduction();
+                m.data = new EchoResourceProduction();
                 break;
             case ITEMS_TYPE:
-                d = new EchoItems();
+                m.data = new EchoItems();
                 break;
             default:
                 throw new IllegalArgumentException("Type outside of range.");
         }
 
-        return d;
+        m.type = type;
+
+        return m;
     }
 }
