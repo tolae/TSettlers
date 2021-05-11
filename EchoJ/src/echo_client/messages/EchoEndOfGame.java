@@ -34,4 +34,14 @@ public class EchoEndOfGame implements IEchoData {
     public int getLength() {
         return END_OF_GAME_DATA_LENGTH;
     }
+
+    @Override
+    public String toString() {
+        return "EOG: VP" + victoryPoints[0] +
+                " A" + victoryPoints[1] +
+                " B" + victoryPoints[2] +
+                " C" + victoryPoints[3] +
+                " D" + victoryPoints[4] +
+                " Z" + resourcesEarned;
+    }
 }

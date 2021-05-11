@@ -1,5 +1,6 @@
 package echo_client;
 
+import echo_client.messages.EchoEndOfGame;
 import echo_client.messages.EchoFactory;
 import soc.baseclient.ServerConnectInfo;
 import soc.game.SOCGame;
@@ -42,6 +43,7 @@ public class EchoClient extends SOCRobotClient {
 
                 EchoMessage eog = EchoFactory.build(EchoFactory.END_OF_GAME_TYPE);
                 eog.data.setData(ourPlayer);
+                System.out.println(((EchoEndOfGame) eog.data).toString());
                 pyClient.transmit(eog);
             }
         }
