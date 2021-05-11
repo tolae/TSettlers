@@ -104,20 +104,4 @@ public class EchoBrain extends SOCRobotBrain {
 
         action = plan.data.getByte(0);
     }
-
-    @Override
-    protected void handleGAMESTATE(int gs) {
-        if (gs == SOCGame.OVER) {
-            System.out.print("Total Gained Resources: ");
-            System.out.println(ourPlayerData.getResources().getGainedTotal());
-
-            System.out.print("Total Lost Resources: ");
-            System.out.println(ourPlayerData.getResources().getLostTotal());
-
-            EchoMessage eog = EchoFactory.build(EchoFactory.END_OF_GAME_TYPE);
-            eog.data.setData(ourPlayerData);
-            ((EchoClient) this.client).pyClient.transmit(eog);
-        }
-        super.handleGAMESTATE(gs);
-    }
 }

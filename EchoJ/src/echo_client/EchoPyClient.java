@@ -23,8 +23,11 @@ public class EchoPyClient implements Runnable {
 
     private boolean pyConnected;
 
+    private int attempts;
+
     public EchoPyClient() {
         this.pyConnected = false;
+        this.attempts = 0;
     }
 
     public void init() {
@@ -51,9 +54,17 @@ public class EchoPyClient implements Runnable {
                 } catch (InterruptedException e) { }
             }).start();
         } catch (IOException e) {
-            System.err.println("Unable to connect to Python Brain Socket: " + e);
+            if (attempts++ < 3) {
+                System.err.println("Unable to connect to Python Brain Socket: Attempt " + attempts);
+                this.init();
+            }
+            else {
+                System.err.println("Failed to connect to Python Brain Socket!");
+                e.printStackTrace();
+            }
         } catch (Exception e) {
-            System.err.println("An error has occured in EchoPyClient: " + e);
+            System.err.println("An error has occured in EchoPyClient!");
+            throw e;
         }
     }
 

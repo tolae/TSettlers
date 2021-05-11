@@ -1,7 +1,10 @@
 package echo_client;
 
+import echo_client.messages.EchoFactory;
 import soc.baseclient.ServerConnectInfo;
 import soc.game.SOCGame;
+import soc.game.SOCPlayer;
+import soc.message.SOCDeleteGame;
 import soc.message.SOCMessage;
 import soc.robot.SOCRobotBrain;
 import soc.robot.SOCRobotClient;
@@ -22,6 +25,28 @@ public class EchoClient extends SOCRobotClient {
             (final SOCRobotParameters params, final SOCGame ga, final CappedQueue<SOCMessage> mq)
     {
         return new EchoBrain(this, params, ga, mq);
+    }
+
+    @Override
+    protected void handleDELETEGAME(SOCDeleteGame mes) {
+        SOCGame ga = games.get(mes.getGame());
+        if (ga != null) {
+            if (ga.getGameState() == SOCGame.OVER) {
+                SOCPlayer ourPlayer = ga.getPlayer("TBot");
+
+                System.out.print("Total Gained Resources: ");
+                System.out.println(ourPlayer.getResources().getGainedTotal());
+
+                System.out.print("Total Lost Resources: ");
+                System.out.println(ourPlayer.getResources().getLostTotal());
+
+                EchoMessage eog = EchoFactory.build(EchoFactory.END_OF_GAME_TYPE);
+                eog.data.setData(ourPlayer);
+                pyClient.transmit(eog);
+            }
+        }
+
+        super.handleDELETEGAME(mes);
     }
 
     @Override
