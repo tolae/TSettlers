@@ -133,3 +133,6 @@ dmypy.json
 
 # Ignore output artifacts
 out/
+
+# Ignore training logs
+logs/
